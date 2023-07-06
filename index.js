@@ -82,11 +82,11 @@ app.post("/login", async (req,res)=>{
 })
 
 // const cookieParser = require("cookie-parser");
-app.get("/profile", async (req,res)=>{
+app.get("/home", async (req,res)=>{
     // res.json(req.cookies)
     const {token} = req.cookies;
-    console.log("88 : cooki",req.cookies)
-    console.log("89: login token : ",token)
+    // console.log("88 : cooki",req.cookies)
+    // console.log("89: login token : ",token)
     try {
         const jwtVerify = await jwt.verify(token , "sec");
         console.log("login verify tok",jwtVerify)
@@ -94,8 +94,10 @@ app.get("/profile", async (req,res)=>{
     } catch (error) {
         res.status(410).json("jwt error")
     }
+    // res.json("works")
    
-})
+}
+)
 
 app.post("/logout", async (req,res)=>{
     // const {token} = req.cookies;
