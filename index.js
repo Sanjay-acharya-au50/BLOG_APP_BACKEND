@@ -14,9 +14,9 @@ const Post = require("./model/PostSchema");
 
 
 const app = express();
-
+// https://sanjay-blog-app.vercel.app
 app.use(cors({
-    origin:"https://sanjay-blog-app.vercel.app",
+    origin:"http://localhost:5173",
     credentials:true,
 }))
 
@@ -124,7 +124,7 @@ app.post("/post", upload.single("files"), async (req,res)=>{
     // console.log("tok",token)
     try {
         const jwtVerify = await jwt.verify(token , "sec");
-        // console.log("kwt veryfy",jwtVerify)
+        console.log("kwt veryfy",jwtVerify)
         const postDoc = await Post.create({
             img,
             title,
