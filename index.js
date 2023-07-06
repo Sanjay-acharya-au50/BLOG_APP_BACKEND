@@ -85,10 +85,11 @@ app.post("/login", async (req,res)=>{
 app.get("/profile", async (req,res)=>{
     // res.json(req.cookies)
     const {token} = req.cookies;
-    // console.log("cooki",req.cookies)
+    console.log("88 : cooki",req.cookies)
+    console.log("89: login token : ",token)
     try {
         const jwtVerify = await jwt.verify(token , "sec");
-        // console.log(jwtVerify)
+        console.log("login verify tok",jwtVerify)
         res.status(200).json(jwtVerify);
     } catch (error) {
         res.status(410).json("jwt error")
