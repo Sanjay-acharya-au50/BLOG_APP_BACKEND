@@ -16,7 +16,7 @@ const Post = require("./model/PostSchema");
 const app = express();
 // https://sanjay-blog-app.vercel.app
 app.use(cors({
-    origin:"https://sanjay-blog-app.vercel.app",
+    origin:"http://localhost:5173",
     credentials:true,
 }))
 
@@ -108,8 +108,10 @@ app.post("/post", upload.single("files"), async (req,res)=>{
     
     const {originalname, path} = req.file;
     const {title, sumamry, quill} = req.body;
+    console.log("req body",req.body)
+    console.log("110 titel, sum:",title,sumamry,quill)
    
-    // console.log(originalname)
+    console.log(originalname)
     const part = originalname.split(".");
     // console.log(part)
     const ext = part[part.length-1]
@@ -118,10 +120,9 @@ app.post("/post", upload.single("files"), async (req,res)=>{
     // console.log(img)
     // saving image with extension in uploads
     fs.renameSync(path,path+"."+ext)
-    // console.log(req.body)
 
     const {token} = req.cookies;
-    // console.log("tok",token)
+    console.log("tok",token)
     try {
         const jwtVerify = await jwt.verify(token , "sec");
         console.log("kwt veryfy",jwtVerify)
@@ -133,11 +134,11 @@ app.post("/post", upload.single("files"), async (req,res)=>{
             author:jwtVerify.id
         })
         res.json(postDoc)
-        // console.log(postDoc)
+        console.log(postDoc)
 
         // console.log("143", jwtVerify)
     } catch (error) {
-        res.status(410).json("jwt error")
+        res.status(410).json("140 jwt error")
     }
 
    
@@ -160,20 +161,23 @@ app.get('/post/:id', async (req,res)=>{
 app.put("/edit/:id", upload.single("files"), async (req,res)=>{
     let img = null;
     if(req.file){
-    const {originalname, path} = req.file;
+        const {originalname, path} = req.file;
     const part = originalname.split(".");
     const ext = part[part.length-1]
     let img = path+"."+ext;
     fs.renameSync(path,path+"."+ext)
-    }
-    const {title, sumamry, quill,id} = req.body;
+}
+console.log("rq body",req.body)
+const {title, sumamry, quill,id} = req.body;
+console.log(":destruc:",title, sumamry, quill,id)
     const {token} = req.cookies;
+    console.log("token:", token)
     try {
         const jwtVerify = await jwt.verify(token , "sec");
-        // console.log("kwt veryfy",jwtVerify)
+        console.log("kwt veryfy",jwtVerify)
         const postDoc = await Post.findById(id);
         console.log(postDoc,"174")
-        // console.log(JSON.stringify(jwtVerify.id) === JSON.stringify(postDoc.author))
+        console.log("truFAll",JSON.stringify(jwtVerify.id) === JSON.stringify(postDoc.author))
         const validUser = JSON.stringify(jwtVerify.id) === JSON.stringify(postDoc.author)
         console.log("v",validUser)
         if(validUser){
