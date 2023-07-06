@@ -16,7 +16,7 @@ const Post = require("./model/PostSchema");
 const app = express();
 // https://sanjay-blog-app.vercel.app
 app.use(cors({
-    origin:"http://localhost:5173",
+    origin:"https://sanjay-blog-app.vercel.app",
     credentials:true,
 }))
 
