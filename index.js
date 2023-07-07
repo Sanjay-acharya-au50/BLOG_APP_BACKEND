@@ -107,7 +107,11 @@ app.get("/home", async (req,res)=>{
 app.post("/logout", async (req,res)=>{
     // const {token} = req.cookies;
     // console.log("token:",token);
-      res.clearCookie("token").json("logout suc")
+      res.clearCookie("jwtSign", {
+        secure:true,
+        sameSite:'none',
+        expires:new Date(0)
+      }).json("logout suc")
 
 })
 
