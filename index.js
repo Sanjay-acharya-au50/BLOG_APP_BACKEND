@@ -130,10 +130,10 @@ app.post("/post", upload.single("files"), async (req,res)=>{
         fs.renameSync(path,path+"."+ext)
 
 
-    const {token} = req.cookies;
-    console.log("tok",token)
+    const {jwtSign} = req.cookies;
+    console.log("tok",jwtSign)
     try {
-        const jwtVerify = await jwt.verify(token , "sec");
+        const jwtVerify = await jwt.verify(jwtSign , "sec");
         console.log("kwt veryfy",jwtVerify)
         const postDoc = await Post.create({
             img,
