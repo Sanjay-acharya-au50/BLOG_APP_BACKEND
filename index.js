@@ -1,6 +1,5 @@
 const express = require("express");
 const cors = require("cors");
-const bodyParser = require("body-parser");
 require('./db/db')
 const User = require("./model/UserSchema")
 const bcrypt = require("bcrypt");
@@ -22,16 +21,15 @@ app.use(cors({
 
 // middlware
 app.use(express.json());
-app.use(bodyParser.json());
 app.use(cookieParser())
 
 app.use('/uploads', express.static(__dirname+'/uploads'))
 
 // register 
 app.post("/register", async (req,res)=>{
-    const {email, password} = req.body;
+    const {name, email, password} = req.body;
 
-    if(!email || !password){
+    if(!name, !email || !password){
        return res.status(400).json("empty fields")
     }
     const isExist = await User.findOne({email});
@@ -42,7 +40,7 @@ app.post("/register", async (req,res)=>{
                 const salt = await bcrypt.genSalt(10);
                 const hashedPass = await bcrypt.hash(password, salt);
                 // res.json(hashedPass)
-                const user = await User.create({email,password:hashedPass});
+                const user = await User.create({name,email,password:hashedPass});
                 res.status(200).json(user);
     }
 
@@ -66,10 +64,10 @@ app.post("/login", async (req,res)=>{
             const validCred = await bcrypt.compare(password, isExist.password)
             if(validCred){
                 // console.log("login Suc")
-                const jwtSign = await jwt.sign({id:isExist._id, email:isExist.email},"sec")
+                const jwtSign = jwt.sign({id:isExist._id, email:isExist.email, name:isExist.name},"sec")
                 // console.log("jwtSign:",jwtSign)
-                res.cookie("token", jwtSign )
-                return res.status(210).json({id:isExist._id, email:isExist.email})
+                res.cookie("jwtSign", jwtSign )
+                return res.status(210).json({id:isExist._id, email:isExist.email, name:isExist.name})
 
             }
         }
@@ -84,13 +82,16 @@ app.post("/login", async (req,res)=>{
 // const cookieParser = require("cookie-parser");
 app.get("/home", async (req,res)=>{
     // res.json(req.cookies)
-    const {token} = req.cookies;
+    const {jwtSign} = req.cookies;
     // console.log("88 : cooki",req.cookies)
     // console.log("89: login token : ",token)
     try {
-        const jwtVerify = await jwt.verify(token , "sec");
-        console.log("login verify tok",jwtVerify)
-        res.status(200).json(jwtVerify);
+        if(jwtSign){
+            const jwtVerify = await jwt.verify(jwtSign , "sec");
+            
+            console.log("login verify tok",jwtVerify)
+            res.status(200).json(jwtVerify);
+        }
     } catch (error) {
         res.status(410).json("jwt error")
     }
@@ -108,21 +109,22 @@ app.post("/logout", async (req,res)=>{
 
 
 app.post("/post", upload.single("files"), async (req,res)=>{
-    
-    const {originalname, path} = req.file;
-    const {title, sumamry, quill} = req.body;
-    console.log("req body",req.body)
-    console.log("110 titel, sum:",title,sumamry,quill)
-   
-    console.log(originalname)
-    const part = originalname.split(".");
-    // console.log(part)
-    const ext = part[part.length-1]
-    // console.log(ext)
-    const img = path+"."+ext;
-    // console.log(img)
-    // saving image with extension in uploads
-    fs.renameSync(path,path+"."+ext)
+  
+        const {originalname, path} = req.file;
+        const {title, sumamry, quill} = req.body;
+        console.log("req body",req.body)
+        console.log("110 titel, sum:",title,sumamry,quill)
+       
+        console.log(originalname)
+        const part = originalname.split(".");
+        // console.log(part)
+        const ext = part[part.length-1]
+        // console.log(ext)
+        const img = path+"."+ext;
+        // console.log(img)
+        // saving image with extension in uploads
+        fs.renameSync(path,path+"."+ext)
+
 
     const {token} = req.cookies;
     console.log("tok",token)
