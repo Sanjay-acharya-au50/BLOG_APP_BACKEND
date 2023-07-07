@@ -15,7 +15,7 @@ const Post = require("./model/PostSchema");
 const app = express();
 // https://sanjay-blog-app.vercel.app
 app.use(cors({
-    origin:"http://localhost:5173",
+    origin:"https://sanjay-blog-app.vercel.app",
     credentials:true,
 }))
 
@@ -66,7 +66,11 @@ app.post("/login", async (req,res)=>{
                 // console.log("login Suc")
                 const jwtSign = jwt.sign({id:isExist._id, email:isExist.email, name:isExist.name},"sec")
                 // console.log("jwtSign:",jwtSign)
-                res.cookie("jwtSign", jwtSign )
+                res.cookie("jwtSign", jwtSign ,
+                {
+                    sameSite: 'none',
+                    secure: true,
+                })
                 return res.status(210).json({id:isExist._id, email:isExist.email, name:isExist.name})
 
             }
@@ -88,7 +92,7 @@ app.get("/home", async (req,res)=>{
     try {
         if(jwtSign){
             const jwtVerify = await jwt.verify(jwtSign , "sec");
-            
+
             console.log("login verify tok",jwtVerify)
             res.status(200).json(jwtVerify);
         }
