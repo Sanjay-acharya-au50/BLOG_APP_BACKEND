@@ -164,7 +164,7 @@ app.post("/post", upload.single("files"), async (req,res)=>{
 
 app.get("/post", async (req,res)=>{
     // error
-    const data = await Post.find().populate('author', ['email']).sort({createdAt : -1}).limit(20)
+    const data = await Post.find().populate('author', ['email','name']).sort({createdAt : -1}).limit(20)
     // const data = await Post.find()
     res.json(data)
     // console.log(data);
