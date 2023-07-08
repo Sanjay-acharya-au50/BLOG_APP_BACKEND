@@ -69,10 +69,10 @@ app.post("/login", async (req,res)=>{
                 // console.log("jwtSign:",jwtSign)
                 res.cookie("jwtSign", jwtSign ,
                 // for localhost comment here
-                // {
-                //     sameSite: 'none',
-                //     secure: true,
-                // }
+                {
+                    sameSite: 'none',
+                    secure: true,
+                }
                 )
                 return res.status(210).json({id:isExist._id, email:isExist.email, name:isExist.name})
 
