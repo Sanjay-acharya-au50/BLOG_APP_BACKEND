@@ -58,7 +58,7 @@ app.post("/login", async (req,res)=>{
         const isExist = await User.findOne({email});
         // console.log("user",isExist)
         if(!isExist){
-            res.json("u r not user")
+            res.status(410).json("Email id is not register")
         }
         else{
 
@@ -69,13 +69,15 @@ app.post("/login", async (req,res)=>{
                 // console.log("jwtSign:",jwtSign)
                 res.cookie("jwtSign", jwtSign ,
                 // for localhost comment here
-                {
-                    sameSite: 'none',
-                    secure: true,
-                }
+                // {
+                //     sameSite: 'none',
+                //     secure: true,
+                // }
                 )
                 return res.status(210).json({id:isExist._id, email:isExist.email, name:isExist.name})
 
+            }else{
+                return res.status(410).json("Wrong Credentials")
             }
         }
 
@@ -175,27 +177,35 @@ app.get('/post/:id', async (req,res)=>{
 })
 
 app.put("/edit/:id", upload.single("files"), async (req,res)=>{
-    let img = null;
+    // console.log("req",req.file)
     if(req.file){
         const {originalname, path} = req.file;
-    const part = originalname.split(".");
-    const ext = part[part.length-1]
-    let img = path+"."+ext;
-    fs.renameSync(path,path+"."+ext)
-}
-console.log("rq body",req.body)
+        var img = null;
+        const part = originalname.split(".");
+        console.log("p",part)
+        const ext = part[part.length-1]
+        console.log("ext",ext);
+        img = path+"."+ext;
+        console.log("imgt",img)
+
+        fs.renameSync(path,img)
+    }
+    console.log("img",img)
+   
+// console.log("rq body",req.body)
 const {title, sumamry, quill,id} = req.body;
-console.log(":destruc:",title, sumamry, quill,id)
-    const {token} = req.cookies;
-    console.log("token:", token)
+// console.log(":destruc:",title, sumamry, quill,id)
+    const {jwtSign} = req.cookies;
+    // console.log("token:", jwtSign)
     try {
-        const jwtVerify = await jwt.verify(token , "sec");
-        console.log("kwt veryfy",jwtVerify)
+        const jwtVerify = await jwt.verify(jwtSign , "sec");
+        // console.log("kwt veryfy",jwtVerify)
         const postDoc = await Post.findById(id);
-        console.log(postDoc,"174")
-        console.log("truFAll",JSON.stringify(jwtVerify.id) === JSON.stringify(postDoc.author))
+        // console.log(postDoc,"174")
+        // console.log("truFAll",JSON.stringify(jwtVerify.id) === JSON.stringify(postDoc.author))
         const validUser = JSON.stringify(jwtVerify.id) === JSON.stringify(postDoc.author)
-        console.log("v",validUser)
+        // console.log("v",validUser)
+        
         if(validUser){
             const postDocUpdate = await postDoc.updateOne({
             img : img ? img : postDoc.img,
@@ -204,7 +214,7 @@ console.log(":destruc:",title, sumamry, quill,id)
             quill,
         })
         res.json(postDocUpdate)
-        console.log(postDocUpdate)
+        console.log("postDoc",postDocUpdate)
 
         }
         
