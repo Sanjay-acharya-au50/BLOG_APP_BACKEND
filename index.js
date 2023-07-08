@@ -15,7 +15,7 @@ const Post = require("./model/PostSchema");
 const app = express();
 
 app.use(cors({
-    origin:"https://sanjay-blog-app.vercel.app",
+    origin:"https://sanjay-blog-app-website.onrender.com",
     // origin:"http://localhost:5173",
     credentials:true,
 }))
