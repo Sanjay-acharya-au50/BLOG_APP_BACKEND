@@ -16,8 +16,8 @@ const cloudinary = require("cloudinary").v2;
 const app = express();
 
 app.use(cors({
-    // origin:"https://sanjay-blog-app.vercel.app",
-    origin:"http://localhost:5173",
+    origin:"https://sanjay-blog-app.vercel.app",
+    // origin:"http://localhost:5173",
     credentials:true,
 }))
 
