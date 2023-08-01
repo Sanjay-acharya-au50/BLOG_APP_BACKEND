@@ -6,10 +6,11 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const multer  = require('multer')
-const upload = multer({ dest: './uploads/' })
+// const upload = multer({ dest: './uploads/' })
 // fs = file system
 const fs = require("fs");
 const Post = require("./model/PostSchema");
+const cloudinary = require("cloudinary").v2;
 
 
 const app = express();
@@ -24,7 +25,16 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser())
 
-app.use('/uploads', express.static(__dirname+'/uploads'))
+// app.use('/uploads', express.static(__dirname+'/uploads'))
+
+cloudinary.config({
+    cloud_name: "dk1jjppkk",
+    api_secret: "3I7pCkcd8ZXutlhEJQJqaTAByYA",
+    api_key: "732113818452973",
+  });
+
+  const upload = multer({ storage: multer.diskStorage({}) });
+
 
 // register 
 app.post("/register", async (req,res)=>{
@@ -137,6 +147,7 @@ app.post("/post", upload.single("files"), async (req,res)=>{
         // console.log(img)
         // saving image with extension in uploads
         fs.renameSync(path,path+"."+ext)
+        const result = await cloudinary.uploader.upload(path, {folder : "argon" });
 
 
     const {jwtSign} = req.cookies;
@@ -145,7 +156,7 @@ app.post("/post", upload.single("files"), async (req,res)=>{
         const jwtVerify = await jwt.verify(jwtSign , "sec");
         console.log("kwt veryfy",jwtVerify)
         const postDoc = await Post.create({
-            img,
+            img :result.secure_url,
             title,
             sumamry,
             quill,
