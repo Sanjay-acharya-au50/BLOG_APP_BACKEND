@@ -16,8 +16,8 @@ const cloudinary = require("cloudinary").v2;
 const app = express();
 
 app.use(cors({
-    origin:"https://sanjay-blog-app.vercel.app",
-    // origin:"http://localhost:5173",
+    // origin:"https://sanjay-blog-app.vercel.app",
+    origin:"http://localhost:5173",
     credentials:true,
 }))
 
@@ -189,7 +189,7 @@ app.get('/post/:id', async (req,res)=>{
 
 app.put("/edit/:id", upload.single("files"), async (req,res)=>{
     // console.log("req",req.file)
-    const { path} = req.file;
+    const { path } = req.file;
     // if(req.file){
     //     var img = null;
     //     const part = originalname.split(".");
@@ -209,24 +209,29 @@ const {title, sumamry, quill,id} = req.body;
     const {jwtSign} = req.cookies;
     // console.log("token:", jwtSign)
     try {
-        const result = await cloudinary.uploader.upload(path, {folder : "argon" });
+
         const jwtVerify = await jwt.verify(jwtSign , "sec");
-        // console.log("kwt veryfy",jwtVerify)
+        console.log("kwt veryfy",jwtVerify)
         const postDoc = await Post.findById(id);
         // console.log(postDoc,"174")
         // console.log("truFAll",JSON.stringify(jwtVerify.id) === JSON.stringify(postDoc.author))
         const validUser = JSON.stringify(jwtVerify.id) === JSON.stringify(postDoc.author)
-        // console.log("v",validUser)
-        
+        console.log("v",validUser)
+        let image = postDoc.img;
+        if(path){
+            const result = await cloudinary.uploader.upload(path, {folder : "argon" });
+            console.log('result',result)
+            image = result.secure_url;
+        }
         if(validUser){
             const postDocUpdate = await postDoc.updateOne({
-            img : img ? img : result.secure_url,
+            img : image,
             title,
             sumamry,
             quill,
         })
-        res.json(postDocUpdate)
         console.log("postDoc",postDocUpdate)
+        return res.status(200).json(postDocUpdate)
 
         }
         
