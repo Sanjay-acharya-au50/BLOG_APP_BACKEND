@@ -133,27 +133,27 @@ app.post("/logout", async (req,res)=>{
 
 app.post("/post", upload.single("files"), async (req,res)=>{
   
-        const {originalname, path} = req.file;
+        const { path} = req.file;
         const {title, sumamry, quill} = req.body;
-        console.log("req body",req.body)
+        console.log("req body",req.body);
         console.log("110 titel, sum:",title,sumamry,quill)
        
-        console.log(originalname)
-        const part = originalname.split(".");
+        // console.log(originalname)
+        // const part = originalname.split(".");
         // console.log(part)
-        const ext = part[part.length-1]
+        // const ext = part[part.length-1]
         // console.log(ext)
-        const img = path+"."+ext;
+        // const img = path+"."+ext;
         // console.log(img)
         // saving image with extension in uploads
-        fs.renameSync(path,path+"."+ext)
-        const result = await cloudinary.uploader.upload(path, {folder : "argon" });
-
-
-    const {jwtSign} = req.cookies;
-    console.log("tok",jwtSign)
-    try {
-        const jwtVerify = await jwt.verify(jwtSign , "sec");
+        // fs.renameSync(path,path+"."+ext)
+        
+        
+        const {jwtSign} = req.cookies;
+        console.log("tok",jwtSign)
+        try {
+            const result = await cloudinary.uploader.upload(path, {folder : "argon" });
+            const jwtVerify = await jwt.verify(jwtSign , "sec");
         console.log("kwt veryfy",jwtVerify)
         const postDoc = await Post.create({
             img :result.secure_url,
