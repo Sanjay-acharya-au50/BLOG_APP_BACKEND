@@ -189,19 +189,19 @@ app.get('/post/:id', async (req,res)=>{
 
 app.put("/edit/:id", upload.single("files"), async (req,res)=>{
     // console.log("req",req.file)
-    if(req.file){
-        const {originalname, path} = req.file;
-        var img = null;
-        const part = originalname.split(".");
-        console.log("p",part)
-        const ext = part[part.length-1]
-        console.log("ext",ext);
-        img = path+"."+ext;
-        console.log("imgt",img)
+    const { path} = req.file;
+    // if(req.file){
+    //     var img = null;
+    //     const part = originalname.split(".");
+    //     console.log("p",part)
+    //     const ext = part[part.length-1]
+    //     console.log("ext",ext);
+    //     img = path+"."+ext;
+    //     console.log("imgt",img)
 
-        fs.renameSync(path,img)
-    }
-    console.log("img",img)
+    //     fs.renameSync(path,img)
+    // }
+    // console.log("img",img)
    
 // console.log("rq body",req.body)
 const {title, sumamry, quill,id} = req.body;
@@ -209,6 +209,7 @@ const {title, sumamry, quill,id} = req.body;
     const {jwtSign} = req.cookies;
     // console.log("token:", jwtSign)
     try {
+        const result = await cloudinary.uploader.upload(path, {folder : "argon" });
         const jwtVerify = await jwt.verify(jwtSign , "sec");
         // console.log("kwt veryfy",jwtVerify)
         const postDoc = await Post.findById(id);
@@ -219,7 +220,7 @@ const {title, sumamry, quill,id} = req.body;
         
         if(validUser){
             const postDocUpdate = await postDoc.updateOne({
-            img : img ? img : postDoc.img,
+            img : img ? img : result.secure_url,
             title,
             sumamry,
             quill,
